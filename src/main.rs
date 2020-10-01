@@ -101,42 +101,42 @@ impl Statement {
     fn new(clauses: &[Clause]) -> Self {
         Self(clauses.iter().cloned().collect())
     }
-}
 
-fn resolve(statement: Statement) -> bool {
-    let mut knowledge_base = statement.clone();
-    let kb_size = knowledge_base.0.len();
-    for clause1 in &statement.0 {
-        for literal1 in &clause1.0 {
-            for clause2 in &statement.0 {
-                for literal2 in &clause2.0 {
-                    if literal1.m == literal2.m && literal1.negated != literal2.negated {
-                        eprint!(
-                            "Ruling out {} from {} and {} ",
-                            literal1.normalize(),
-                            clause1,
-                            clause2
-                        );
-                        let new_clause = clause1.rule_out(&clause2, literal1);
-                        eprint!("producing {}", new_clause);
-                        if new_clause.is_empty() {
-                            eprintln!(" which proves the statement unsatisfiable.");
-                            return true;
-                        }
-                        if knowledge_base.insert(new_clause) {
-                            eprintln!(" which is new knowledge.")
-                        } else {
-                            eprintln!(" which is redundant knowledge.");
+    fn resolve(&self) -> bool {
+        let mut knowledge_base = self.clone();
+        let kb_size = knowledge_base.len();
+        for clause1 in &self.0 {
+            for literal1 in &clause1.0 {
+                for clause2 in &self.0 {
+                    for literal2 in &clause2.0 {
+                        if literal1.m == literal2.m && literal1.negated != literal2.negated {
+                            eprint!(
+                                "Ruling out {} from {} and {} ",
+                                literal1.normalize(),
+                                clause1,
+                                clause2
+                            );
+                            let new_clause = clause1.rule_out(&clause2, literal1);
+                            eprint!("producing {}", new_clause);
+                            if new_clause.is_empty() {
+                                eprintln!(" which proves the statement unsatisfiable.");
+                                return true;
+                            }
+                            if knowledge_base.insert(new_clause) {
+                                eprintln!(" which is new knowledge.")
+                            } else {
+                                eprintln!(" which is redundant knowledge.");
+                            }
                         }
                     }
                 }
             }
         }
-    }
-    if knowledge_base.len() == kb_size {
-        false
-    } else {
-        resolve(knowledge_base)
+        if knowledge_base.len() == kb_size {
+            false
+        } else {
+            knowledge_base.resolve()
+        }
     }
 }
 
@@ -183,5 +183,5 @@ fn main() {
         }]),
     ]);
 
-    println!("{:?}", resolve(statement));
+    println!("{:?}", statement.resolve());
 }
