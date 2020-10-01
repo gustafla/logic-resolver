@@ -88,18 +88,16 @@ impl Clause {
 struct Statement(HashSet<Clause>);
 
 impl Statement {
+    fn new(clauses: &[Clause]) -> Self {
+        Self(clauses.iter().cloned().collect())
+    }
+
     fn len(&self) -> usize {
         self.0.len()
     }
 
     fn insert(&mut self, clause: Clause) -> bool {
         self.0.insert(clause)
-    }
-}
-
-impl Statement {
-    fn new(clauses: &[Clause]) -> Self {
-        Self(clauses.iter().cloned().collect())
     }
 
     fn resolve(&self) -> bool {
@@ -138,11 +136,6 @@ impl Statement {
             knowledge_base.resolve()
         }
     }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
 }
 
 fn main() {
