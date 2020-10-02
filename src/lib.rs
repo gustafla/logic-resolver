@@ -71,9 +71,11 @@ impl Clause {
         self.0.is_empty()
     }
 
+    /// target has to be from self (has to have the same sign)
     fn rule_out(&self, with: &Clause, target: &Literal) -> Self {
-        let mut set = BTreeSet::new();
-        for literal in self.0.iter().chain(with.0.iter()) {
+        let mut set = self.0.clone();
+        assert!(set.remove(target));
+        for literal in with.0.iter() {
             if literal.m != target.m {
                 set.insert(*literal);
             }
