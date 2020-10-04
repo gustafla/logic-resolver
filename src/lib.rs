@@ -75,9 +75,9 @@ impl Clause {
     fn rule_out(&self, with: &Clause, target: &Literal) -> Self {
         let mut set = self.0.clone();
         assert!(set.remove(target));
-        for literal in with.0.iter() {
-            if literal.m != target.m {
-                set.insert(*literal);
+        for &literal in with.0.iter() {
+            if literal.m != target.m || literal.negated == target.negated {
+                set.insert(literal);
             }
         }
         Self(set)
